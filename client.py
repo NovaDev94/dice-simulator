@@ -9,7 +9,7 @@ class DiceClient(object):
     MIN_BET = 0.01
     SAFE_MODE = False
     LONGEST_ALLOWED_STREAK = 15
-    DANGER_STREAK = 1000
+    DANGER_STREAK = 5000000
 
     def __init__(self, server):
         self.server = server
@@ -97,25 +97,27 @@ class DiceClient(object):
         profit = self.balance - self.initial_balance
         time_delta = datetime.now() - self.start_time
         running_time = time_delta.total_seconds()
-        print '-' * 80
-        print 'Rounds = %s' % self.round_no
-        # print 'Time   = %.2f seconds' % running_time
-        print 'Streak = %s' % self.longest_streak
-        print 'Ratio^ = %.2f%%' % (self.peak_ratio * 100)
-        print
-        print 'Peak   = %.2f' % self.peak_balance
-        print 'Begin  = %.2f' % self.initial_balance
-        print 'End    = %.2f' % self.balance
-        print 'Profit = %s (%.4f%%)' % (
-            profit, profit / self.initial_balance * 100)
-        print '    per round  = %s (%.8f%%)' % (
-            profit / self.round_no,
-            profit / self.round_no / self.initial_balance * 100)
-        # print '    per second = %s' % (profit / running_time)
-        print '-' * 80
+        # print '-' * 80
+        # print 'Rounds = %s' % self.round_no
+        # # print 'Time   = %.2f seconds' % running_time
+        # print 'Streak = %s' % self.longest_streak
+        # print 'Ratio^ = %.2f%%' % (self.peak_ratio * 100)
+        # print
+        # print 'Peak   = %.2f' % self.peak_balance
+        # print 'Begin  = %.2f' % self.initial_balance
+        # print 'End    = %.2f' % self.balance
+        # print 'Profit = %s (%.4f%%)' % (
+        #     profit, profit / self.initial_balance * 100)
+        # print '    per round  = %s (%.8f%%)' % (
+        #     profit / self.round_no,
+        #     profit / self.round_no / self.initial_balance * 100)
+        # # print '    per second = %s' % (profit / running_time)
+        # print '-' * 80
         self.result['rounds'] = self.round_no
         self.result['longest_streak'] = self.longest_streak
         self.result['peak_balance'] = self.peak_balance
+        self.result['reach_max'] = 1 if (
+            self.current_balance >= self.maximum_balance) else 0
 
     def submit_bet(self, mode, bet_amount):
         self.server.roll(mode, bet_amount)
