@@ -28,3 +28,6 @@ class DiceServer(object):
             self.balance -= bet_amount
         self.balance = utils.to_2(self.balance)
         return result
+
+    def set_balance(self, new_balance):
+        self.balance = new_balance

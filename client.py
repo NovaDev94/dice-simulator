@@ -5,7 +5,7 @@ import utils
 
 
 class DiceClient(object):
-    DEBUG = True
+    DEBUG = False
     MIN_BET = 0.01
     SAFE_MODE = False
     LONGEST_ALLOWED_STREAK = 15
@@ -31,8 +31,10 @@ class DiceClient(object):
         self.peak_ratio = 0
 
         processor = self._process
+        self.result = {}
         while not self.will_stop:
             processor()
+        return self.result
 
     def _process(self):
         new_balance = self.current_balance
@@ -111,6 +113,9 @@ class DiceClient(object):
             profit / self.round_no / self.initial_balance * 100)
         # print '    per second = %s' % (profit / running_time)
         print '-' * 80
+        self.result['rounds'] = self.round_no
+        self.result['longest_streak'] = self.longest_streak
+        self.result['peak_balance'] = self.peak_balance
 
     def submit_bet(self, mode, bet_amount):
         self.server.roll(mode, bet_amount)
