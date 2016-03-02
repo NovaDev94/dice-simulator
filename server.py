@@ -1,5 +1,7 @@
 import random
 
+import utils
+
 
 class DiceServer(object):
     def __init__(self, initial_balance):
@@ -24,4 +26,5 @@ class DiceServer(object):
             self.balance += bet_amount
         else:
             self.balance -= bet_amount
+        self.balance = utils.to_2(self.balance)
         return result

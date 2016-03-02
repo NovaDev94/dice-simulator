@@ -6,9 +6,10 @@ import utils
 
 class DiceClient(object):
     DEBUG = True
-    LONGEST_ALLOWED_STREAK = 20
-    SAFE_MODE = True
     MIN_BET = 0.01
+    SAFE_MODE = False
+    LONGEST_ALLOWED_STREAK = 15
+    DANGER_STREAK = 1000
 
     def __init__(self, server):
         self.server = server
@@ -46,7 +47,11 @@ class DiceClient(object):
         if is_win:
             bet_amount = self.get_initial_bet(new_balance)
         else:
-            bet_amount = self.last_bet * 2
+            if new_streak > self.DANGER_STREAK:
+                bet_amount = self.get_initial_bet(new_balance)
+                new_streak = 0
+            else:
+                bet_amount = self.last_bet * 2
         bet_amount = min(new_balance, bet_amount)
 
         if (new_balance >= self.maximum_balance) or (
@@ -99,8 +104,11 @@ class DiceClient(object):
         print 'Peak   = %.2f' % self.peak_balance
         print 'Begin  = %.2f' % self.initial_balance
         print 'End    = %.2f' % self.balance
-        print 'Profit = %s' % profit
-        print '    per round  = %s' % (profit / self.round_no)
+        print 'Profit = %s (%.4f%%)' % (
+            profit, profit / self.initial_balance * 100)
+        print '    per round  = %s (%.8f%%)' % (
+            profit / self.round_no,
+            profit / self.round_no / self.initial_balance * 100)
         # print '    per second = %s' % (profit / running_time)
         print '-' * 80
 
