@@ -9,7 +9,9 @@ class DiceClient(object):
     MIN_BET = 0.01
     SAFE_MODE = False
     LONGEST_ALLOWED_STREAK = 15
-    DANGER_STREAK = 5000000
+    DANGER_STREAK = 10000000
+    THRESHOLD_JUMP = 8
+    ALL_IN = True
 
     def __init__(self, server):
         self.server = server
@@ -57,7 +59,8 @@ class DiceClient(object):
         bet_amount = min(new_balance, bet_amount)
 
         if (new_balance >= self.maximum_balance) or (
-                new_balance - bet_amount <= self.minimum_balance):
+                new_balance - bet_amount <= self.minimum_balance) or (
+                new_balance == 0):  # To handle all in strategy
             self.will_stop = True
         elif is_win:
             if self.switch_countdown:
@@ -94,9 +97,9 @@ class DiceClient(object):
         return 0
 
     def stop(self):
-        profit = self.balance - self.initial_balance
-        time_delta = datetime.now() - self.start_time
-        running_time = time_delta.total_seconds()
+        # profit = self.balance - self.initial_balance
+        # time_delta = datetime.now() - self.start_time
+        # running_time = time_delta.total_seconds()
         # print '-' * 80
         # print 'Rounds = %s' % self.round_no
         # # print 'Time   = %.2f seconds' % running_time
@@ -131,4 +134,6 @@ class DiceClient(object):
         bet = max(balance / accm, self.MIN_BET)
         if not self.SAFE_MODE:
             bet = min(balance, bet * (self.last_streak + 1))
+        if (self.ALL_IN):
+            bet = self.current_balance
         return utils.to_2(bet)
