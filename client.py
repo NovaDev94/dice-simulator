@@ -5,11 +5,13 @@ import utils
 
 
 class DiceClient(object):
-    DEBUG = True
+    DEBUG = False
     MIN_BET = 0.01
     SAFE_MODE = False
     LONGEST_ALLOWED_STREAK = 15
-    DANGER_STREAK = 1000
+    DANGER_STREAK = 10000000
+    THRESHOLD_JUMP = 8
+    ALL_IN = True
 
     def __init__(self, server):
         self.server = server
@@ -31,8 +33,10 @@ class DiceClient(object):
         self.peak_ratio = 0
 
         processor = self._process
+        self.result = {}
         while not self.will_stop:
             processor()
+        return self.result
 
     def _process(self):
         new_balance = self.current_balance
@@ -55,7 +59,8 @@ class DiceClient(object):
         bet_amount = min(new_balance, bet_amount)
 
         if (new_balance >= self.maximum_balance) or (
-                new_balance - bet_amount <= self.minimum_balance):
+                new_balance - bet_amount <= self.minimum_balance) or (
+                new_balance == 0):  # To handle all in strategy
             self.will_stop = True
         elif is_win:
             if self.switch_countdown:
@@ -92,25 +97,30 @@ class DiceClient(object):
         return 0
 
     def stop(self):
-        profit = self.balance - self.initial_balance
-        time_delta = datetime.now() - self.start_time
-        running_time = time_delta.total_seconds()
-        print '-' * 80
-        print 'Rounds = %s' % self.round_no
-        # print 'Time   = %.2f seconds' % running_time
-        print 'Streak = %s' % self.longest_streak
-        print 'Ratio^ = %.2f%%' % (self.peak_ratio * 100)
-        print
-        print 'Peak   = %.2f' % self.peak_balance
-        print 'Begin  = %.2f' % self.initial_balance
-        print 'End    = %.2f' % self.balance
-        print 'Profit = %s (%.4f%%)' % (
-            profit, profit / self.initial_balance * 100)
-        print '    per round  = %s (%.8f%%)' % (
-            profit / self.round_no,
-            profit / self.round_no / self.initial_balance * 100)
-        # print '    per second = %s' % (profit / running_time)
-        print '-' * 80
+        # profit = self.balance - self.initial_balance
+        # time_delta = datetime.now() - self.start_time
+        # running_time = time_delta.total_seconds()
+        # print '-' * 80
+        # print 'Rounds = %s' % self.round_no
+        # # print 'Time   = %.2f seconds' % running_time
+        # print 'Streak = %s' % self.longest_streak
+        # print 'Ratio^ = %.2f%%' % (self.peak_ratio * 100)
+        # print
+        # print 'Peak   = %.2f' % self.peak_balance
+        # print 'Begin  = %.2f' % self.initial_balance
+        # print 'End    = %.2f' % self.balance
+        # print 'Profit = %s (%.4f%%)' % (
+        #     profit, profit / self.initial_balance * 100)
+        # print '    per round  = %s (%.8f%%)' % (
+        #     profit / self.round_no,
+        #     profit / self.round_no / self.initial_balance * 100)
+        # # print '    per second = %s' % (profit / running_time)
+        # print '-' * 80
+        self.result['rounds'] = self.round_no
+        self.result['longest_streak'] = self.longest_streak
+        self.result['peak_balance'] = self.peak_balance
+        self.result['reach_max'] = 1 if (
+            self.current_balance >= self.maximum_balance) else 0
 
     def submit_bet(self, mode, bet_amount):
         self.server.roll(mode, bet_amount)
@@ -124,4 +134,6 @@ class DiceClient(object):
         bet = max(balance / accm, self.MIN_BET)
         if not self.SAFE_MODE:
             bet = min(balance, bet * (self.last_streak + 1))
+        if (self.ALL_IN):
+            bet = self.current_balance
         return utils.to_2(bet)
