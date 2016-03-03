@@ -2,4 +2,4 @@ import math
 
 
 def to_2(number):
-    return math.trunc(number * 100.) / 100.
+    return round(number * 100.) / 100.

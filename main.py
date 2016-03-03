@@ -1,5 +1,6 @@
 import sys
 import signal
+from collections import Counter
 
 from server import DiceServer
 from client import DiceClient
@@ -42,6 +43,7 @@ avg_streak = float(sum(result['longest_streak']
 avg_peak_balance = float(sum(result['peak_balance']
                              for result in results)) / no_games
 no_reach_max = sum([result['reach_max'] for result in results])
+balances = [result['balance'] for result in results]
 print "Total rounds = %s" % total_rounds
 print "Min rounds = %s" % min_rounds
 print "Max rounds = %s" % max_rounds
@@ -49,5 +51,6 @@ print "Average rounds = %f" % avg_rounds
 print "Average Streak = %f" % avg_streak
 print "Average Peak balance = %f" % avg_peak_balance
 print "Number of Success = %s" % no_reach_max
+print 'Balances = %s' % Counter(balances)
 print '-' * 80
 print 'Success Rate: %.2f%%' % (float(no_reach_max) / no_games * 100)

@@ -103,6 +103,7 @@ class DiceClient(object):
         self.result['peak_balance'] = self.peak_balance
         self.result['reach_max'] = 1 if (
             self.current_balance >= self.maximum_balance) else 0
+        self.result['balance'] = self.balance
 
     def print_statistics(self):
         profit = self.balance - self.initial_balance
