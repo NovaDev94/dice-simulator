@@ -49,3 +49,5 @@ print "Average rounds = %f" % avg_rounds
 print "Average Streak = %f" % avg_streak
 print "Average Peak balance = %f" % avg_peak_balance
 print "Number of Success = %s" % no_reach_max
+print '-' * 80
+print 'Success Rate: %.2f%%' % (float(no_reach_max) / no_games * 100)
